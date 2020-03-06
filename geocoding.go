@@ -48,11 +48,20 @@ func New(key string) *YaGeoInstance {
 
 // Find returns result of search by address
 func (ygi *YaGeoInstance) Find(address string) (result *YaGeoResponse, fErr error) {
-	resp, err := http.Get(fmt.Sprintf("https://geocode-maps.yandex.ru/1.x/?format=json&geocode=%v&apikey=%v", address, ygi.Key))
+	client := &http.Client{}
+	req, err := http.NewRequest("GET", "https://geocode-maps.yandex.ru/1.x/", nil)
 	if err != nil {
 		return result, err
 	}
-
+	q := req.URL.Query()
+	q.Add("apikey", ygi.Key)
+	q.Add("geocode", address)
+	q.Add("format", "json")
+	req.URL.RawQuery = q.Encode()
+	resp, err := client.Do(req)
+	if err != nil {
+		return result, err
+	}
 	jErr := json.NewDecoder(resp.Body).Decode(&result)
 	if jErr != nil {
 		return result, jErr
