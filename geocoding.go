@@ -3,7 +3,6 @@ package yageocoding
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"math"
 	"net/http"
 	"strconv"
