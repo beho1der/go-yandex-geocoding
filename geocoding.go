@@ -39,16 +39,16 @@ type YaGeoMetaData struct {
 // YaGeoInstance instance of Yandex Geocoding API
 type YaGeoInstance struct {
 	Key string
+	Client *http.Client
 }
 
 // New creates a new instance of Yandex Geocoding
-func New(key string) *YaGeoInstance {
-	return &YaGeoInstance{Key: key}
+func New(key string,client *http.Client) *YaGeoInstance {
+	return &YaGeoInstance{Key: key,Client:client}
 }
 
 // Find returns result of search by address
 func (ygi *YaGeoInstance) Find(address string) (result *YaGeoResponse, fErr error) {
-	client := &http.Client{}
 	req, err := http.NewRequest("GET", "https://geocode-maps.yandex.ru/1.x/", nil)
 	if err != nil {
 		return result, err
@@ -58,7 +58,7 @@ func (ygi *YaGeoInstance) Find(address string) (result *YaGeoResponse, fErr erro
 	q.Add("geocode", address)
 	q.Add("format", "json")
 	req.URL.RawQuery = q.Encode()
-	resp, err := client.Do(req)
+	resp, err := ygi.Client.Do(req)
 	if err != nil {
 		return result, err
 	}
